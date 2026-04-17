@@ -13,14 +13,16 @@ export default function Home() {
   const [position, setPosition] = useState("");
   const [lang, setLang] = useState<Lang | null>(null);
   const [difficulty, setDifficulty] = useState<Difficulty | null>(null);
+  const [isNavigating, setIsNavigating] = useState(false);
   const router = useRouter();
   const t = UI[lang ?? "en"];
 
-  const handleStart = () => {
+  const handleStart = async () => {
     if (!name.trim() || !whatsapp.trim() || !position.trim() || !lang || !difficulty) return;
+    setIsNavigating(true);
     const sessionId = crypto.randomUUID();
     sessionStorage.setItem("assessment", JSON.stringify({ candidateName: name.trim(), whatsapp: whatsapp.trim(), position: position.trim(), sessionId, currentTest: 0, results: [], startTime: Date.now(), lang, difficulty }));
-    router.push("/assessment");
+    await router.push("/assessment");
   };
 
   // Language selection screen
@@ -141,10 +143,10 @@ export default function Home() {
             </div>
           </div>
 
-          <button onClick={handleStart} disabled={!name.trim() || !whatsapp.trim() || !position.trim()}
+          <button onClick={handleStart} disabled={!name.trim() || !whatsapp.trim() || !position.trim() || isNavigating}
             className="w-full py-3 rounded-lg font-semibold text-white transition-opacity disabled:opacity-40"
             style={{ background: "#B8943E" }}>
-            {t.start}
+            {isNavigating ? "Loading..." : t.start}
           </button>
 
           <button onClick={() => setDifficulty(null)} className="w-full mt-3 py-2 text-sm" style={{ color: "#8C8175" }}>
